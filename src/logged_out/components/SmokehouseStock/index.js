@@ -1,37 +1,18 @@
 import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import StockWithPics from "./StockWithPics";
 import Modal from "@mui/material/Modal";
 import AddNew from "./AddNew";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 function Home(props) {
   const { selectSmokehouseStock } = props;
-  const [open, setOpen] = React.useState(false);
   const [addNewOpen, setAddNewOpen] = React.useState(false);
   const [allItems, setAllItems] = React.useState([]);
   const [allStock, setAllStock] = React.useState([]);
-  const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
-  };
   const pages = ["+", "Cook"];
   const getItems = async () => {
     const res = await fetch("https://sheline-art-website-api.herokuapp.com/smokehouse-stock/items");
