@@ -8,11 +8,16 @@ import { useParams, useHistory } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import Grid from "@mui/material/Grid";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { set } from "date-fns";
 import { Button } from "react-bootstrap";
+import moment from "moment";
 function StartNewRound(props) {
   const history = useHistory();
   const { holeData } = props;
@@ -21,6 +26,7 @@ function StartNewRound(props) {
   const [names, setNames] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [firstName, setFirstName] = useState("");
+  const [roundsToContinue, setRoundsToContinue] = useState([]);
   const [lastName, setLastName] = useState("");
   const [showAddNewPlayer, setShowAddNewPlayer] = useState(false);
 
@@ -30,7 +36,28 @@ function StartNewRound(props) {
   const fetchPlayers = async () => {
     const response = await fetch("https://sheline-art-website-api.herokuapp.com/the-links-at-the-smokehouse");
     const data = await response.json();
-    const { players } = data;
+    const { players, scores } = data;
+    const nonFinalRounds = scores
+      .filter((round) => !round.final)
+      .map((match) => {
+        console.log("🚀 ~ fetchPlayers ~ match:", match);
+        const filtered = Object.entries(match)
+          .filter(([key, value]) => key.startsWith("player_") && value !== null)
+          .map(([key, value]) => ({
+            playerKey: key,
+            ...JSON.parse(value),
+          }));
+        console.log("🚀 ~ fetchPlayers ~ filtered:", filtered);
+        return {
+          current_hole: match.current_hole,
+          players: filtered,
+          date: match.date,
+          id: match.id,
+          in_progress: match.in_progress,
+        };
+      });
+    console.log("🚀 ~ fetchPlayers ~ nonFinalRounds:", nonFinalRounds);
+    setRoundsToContinue(nonFinalRounds);
     setPlayers(
       players.sort((a, b) => {
         if (a.last_name === "Bullion") return -1;
@@ -42,6 +69,7 @@ function StartNewRound(props) {
   useEffect(() => {
     fetchPlayers();
   }, [isDay, holeData]);
+
   function getRandomColor() {
     const colors = ["red", "blue", "lightgreen", "orange", "purple", "yellow", "pink", "brown", "gray", "black"];
     const index = Math.floor(Math.random() * colors.length);
@@ -50,7 +78,7 @@ function StartNewRound(props) {
   const handleStartRound = async () => {
     const players = selectedPlayers.map(
       (p) =>
-        `{"playerID":${p.id},"hole1":0,"hole2":0,"hole3":0,"hole4":0,"hole5":0,"hole6":0,"hole7":0,"hole8":0,"hole9":0,"playoff1":0,"playoff2":0,"playoff3":0}`
+        `{"playerID":${p.id},"hole1":2,"hole2":3,"hole3":4,"hole4":3,"hole5":4,"hole6":2,"hole7":3,"hole8":3,"hole9":3,"playoff1":0,"playoff2":0,"playoff3":0}`
     );
     const url = "https://sheline-art-website-api.herokuapp.com/the-links-at-the-smokehouse/start-new-round";
     const response = await fetch(url, {
@@ -82,6 +110,19 @@ function StartNewRound(props) {
     const data = await response.json();
     fetchPlayers();
     setShowAddNewPlayer(false);
+  };
+  const handleContinuePreviousRound = () => {
+    try {
+      const response = fetch(`https://sheline-art-website-api.herokuapp.com/the-links-at-the-smokehouse/`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("🚀 ~ handleContinuePreviousRound ~ data:", data);
+          const inProgressRounds = data.scores.filter((round) => round.in_progress);
+          console.log("🚀 ~ handleContinuePreviousRound ~ inProgressRounds:", inProgressRounds);
+        });
+    } catch (error) {
+      console.error("🚀 ~ handleContinuePreviousRound ~ error:", error);
+    }
   };
   return (
     <div
@@ -131,8 +172,46 @@ function StartNewRound(props) {
           onClick={() => {
             showAddNewPlayer ? setShowAddNewPlayer(false) : setShowAddNewPlayer(true);
           }}>
-          <p style={{ fontFamily: "'Baloo Bhaijaan', cursive", fontSize: 20 }}>New Player</p>
+          <p style={{ fontFamily: "'Baloo Bhaijaan', cursive", fontSize: 20 }}>Add a New Player</p>
         </Button>
+        <FormControl style={{ minWidth: 400, marginTop: 20 }}>
+          <InputLabel id="demo-simple-select-label" style={{ color: "white" }}>
+            Select a Round to Continue
+          </InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            sx={{
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "white",
+                color: "white",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "white",
+                color: "white",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "white",
+                color: "white",
+              },
+              placeholder: { color: "white" },
+              color: "white",
+              label: { color: "white" },
+              input: { color: "white" },
+            }}
+            value={null}
+            label="Select a Round to Continue"
+            onChange={(e) => {
+              history.push(`/scorecard/${e.target.value}`);
+            }}>
+            {roundsToContinue?.map((round) => (
+              <MenuItem key={round.id} value={round.id}>
+                {moment(round.date).format("MMMM Do YYYY")} - Hole {round.current_hole} -{" "}
+                {round.players.map((p) => p.first_name).join(", ")}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <Button
           variant="contained"
           disabled={selectedPlayers.length === 0}
@@ -140,7 +219,7 @@ function StartNewRound(props) {
           onClick={() => {
             handleStartRound();
           }}>
-          <p style={{ fontFamily: "'Baloo Bhaijaan', cursive", fontSize: 20 }}>START ROUND</p>
+          <p style={{ fontFamily: "'Baloo Bhaijaan', cursive", fontSize: 20 }}>START NEW ROUND</p>
         </Button>
       </div>
       {showAddNewPlayer && (

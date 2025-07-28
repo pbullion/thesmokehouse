@@ -9,23 +9,20 @@ function ScoreCard(props) {
   const [currentHole, setCurrentHole] = useState(1);
   const [isDay, setIsDay] = useState(true);
   const [roundData, setRoundData] = useState([]);
-  const [data, setData] = useState({
-    date: "2025-07-12",
-  });
   const images = Array.from({ length: 9 }, (_, i) => ({
     original: `${process.env.PUBLIC_URL}/images/smokehouse/holes/${i + 1}.png`,
   }));
   const [holeData, setHoleData] = useState({
     day: {
-      1: { par: 3 },
-      2: { par: 4 },
-      3: { par: 3 },
-      4: { par: 2 },
-      5: { par: 3 },
-      6: { par: 4 },
+      1: { par: 2 },
+      2: { par: 3 },
+      3: { par: 4 },
+      4: { par: 3 },
+      5: { par: 4 },
+      6: { par: 2 },
       7: { par: 3 },
-      8: { par: 2 },
-      9: { par: 2 },
+      8: { par: 3 },
+      9: { par: 3 },
     },
     night: {
       1: { par: 3 },
@@ -39,43 +36,41 @@ function ScoreCard(props) {
       9: { par: 2 },
     },
   });
-  const [players, setPlayers] = useState([
-    {
-      name: "Patrick",
-      lineScore: [],
-    },
-    {
-      name: "Taylor",
-      lineScore: [],
-    },
-    {
-      name: "Ryan",
-      lineScore: [],
-    },
-    {
-      name: "Collin",
-      lineScore: [],
-    },
-    {
-      name: "Carlo",
-      lineScore: [],
-    },
-    {
-      name: "John",
-      lineScore: [],
-    },
-  ]);
+  useEffect(() => {}, [roundData]);
+  const goToNextHole = async () => {
+    try {
+      const response = await fetch(`http://192.168.1.16:3001/the-links-at-the-smokehouse/update-score/${props.roundID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(roundData),
+      });
+      const data = await response.json();
+      const { round } = data;
+      const parsedRoundData = Object.entries(round[0])
+        .filter(([key, value]) => key.startsWith("player_") && value !== null)
+        .map(([key, value]) => ({
+          playerKey: key,
+          ...JSON.parse(value),
+        }));
+      parsedRoundData.map((x) => {
+        const newData = {
+          ...x,
+          [`hole${currentHole + 1}`]: holeData.day[currentHole].par,
+        };
+        return newData;
+      });
+      setRoundData((prev) => parsedRoundData);
+      setCurrentHole((prev) => (prev < 9 ? prev + 1 : 10));
+    } catch (error) {}
+  };
   const fetchData = async () => {
-    console.log("🚀 ~ fetchData ~ props.roundID:", props.roundID);
     const response = await fetch(
       `https://sheline-art-website-api.herokuapp.com/the-links-at-the-smokehouse/round/${props.roundID}`
     );
     const data = await response.json();
-    console.log("🚀 ~ fetchData ~ data:", data);
     const { players, round } = data;
-    console.log("🚀 ~ fetchData ~ round:", round);
-    // console.log("🚀 ~ fetchData ~ round:", round[0]);
-    console.log("🚀 ~ fetchData ~ players:", players);
     const parsedRoundData = Object.entries(round[0])
       .filter(([key, value]) => key.startsWith("player_") && value !== null)
       .map(([key, value]) => ({
@@ -84,13 +79,11 @@ function ScoreCard(props) {
       }))
       .map((x) => {
         const player = players.find((p) => p.id === x.playerID);
-        console.log("🚀 ~ parsedRoundData.map ~ player:", player);
         return {
           ...player,
           ...x,
         };
       });
-    console.log("🚀 ~ fetchData ~ parsedRoundData:", parsedRoundData);
     setRoundData(parsedRoundData);
   };
 
@@ -98,23 +91,6 @@ function ScoreCard(props) {
     fetchData();
   }, []);
 
-  const getScore = (lineScore) => {
-    const total = lineScore.splice(0, currentHole).reduce((acc, score) => acc + score, 0);
-    const { par } = holeData[isDay ? "day" : "night"][currentHole];
-    const score = total - par;
-    if (score === 0) return "E";
-    if (score < 0) return `-${Math.abs(score)}`;
-    if (score > 0) return `+${score}`;
-    return score;
-  };
-  const updatePlayerScore = (player, change) => {
-    // console.log("🚀 ~ updatePlayerScore ~ player, change:", player, change);
-    // const newLineScore = [...player.lineScore];
-    // console.log("🚀 ~ updatePlayerScore ~ newLineScore:", newLineScore);
-    // newLineScore[currentHole - 1] += change;
-    // console.log("🚀 ~ updatePlayerScore ~ newLineScore:", newLineScore);
-    // setPlayers((prevPlayers) => prevPlayers.map((p) => (p.name === player.name ? { ...p, lineScore: newLineScore } : p)));
-  };
   return (
     <div
       style={{
@@ -128,11 +104,20 @@ function ScoreCard(props) {
         backgroundColor: "#2B6649",
       }}>
       <img
-        style={{ height: 150, top: 0, right: 0, position: "absolute" }}
+        style={
+          roundData.length > 5
+            ? { height: 200, bottom: 0, left: 0, position: "absolute", display: currentHole === 3 ? "none" : "block" }
+            : { height: 150, top: 0, right: 0, position: "absolute" }
+        }
         src={`${process.env.PUBLIC_URL}/images/smokehouse/logo.png`}
         alt={"smokehouse"}
       />
-      <img src={images[currentHole - 1].original} style={{ borderRadius: 10 }} alt="hole-layout" />
+      <div
+        style={{ position: "absolute", top: "52vh", left: "17vw", color: "green", backgroundColor: "white", padding: 10 }}>
+        <h3 style={{ margin: 0 }}>Course Record</h3>
+        <h3 style={{ margin: 0 }}>John Hill (-4)</h3>
+      </div>
+      <img src={images[currentHole - 1].original} style={{ borderRadius: 10, height: "100vh" }} alt="hole-layout" />
       <div
         style={{
           display: "flex",
@@ -140,25 +125,43 @@ function ScoreCard(props) {
           alignContent: "center",
           justifyContent: "center",
         }}>
-        <h1
+        <div
           style={{
-            fontSize: "5rem",
-            margin: 0,
+            display: "flex",
+            flexDirection: roundData.length > 5 ? "row" : "column",
+            alignContent: "center",
+            justifyContent: "center",
+            marginBottom: roundData.length > 5 ? 20 : 0,
           }}>
-          Hole {currentHole}
-        </h1>
-        <h1
-          style={{
-            fontSize: "5rem",
-            margin: 0,
-            marginBottom: 50,
-          }}>
-          Par {currentHole}
-        </h1>
+          <h1
+            style={{
+              fontSize: roundData.length > 5 ? "3rem" : "5rem",
+              lineHeight: 1.0,
+              margin: 0,
+            }}>
+            Hole {currentHole}
+          </h1>
+          <h1
+            style={{
+              fontSize: roundData.length > 5 ? "3rem" : "5rem",
+              lineHeight: 1.0,
+              margin: 0,
+              marginBottom: 10,
+              marginLeft: roundData.length > 5 ? 40 : 0,
+            }}>
+            Par {holeData[isDay ? "day" : "night"][currentHole].par}
+          </h1>
+        </div>
         {roundData.map((player, index) => {
           const name = player.first_name + " " + player.last_name;
+          const totalScore = Object.keys(player)
+            .filter((key) => key.startsWith("hole"))
+            .reduce((acc, key) => acc + (player[key] || 0), 0);
+          const toPar = totalScore - 27;
+          const formattedScore = toPar > 0 ? `+${toPar}` : toPar === 0 ? "Even" : toPar;
           return (
             <div
+              key={index}
               style={{
                 display: "flex",
                 flexDirection: "row",
@@ -170,7 +173,7 @@ function ScoreCard(props) {
               <Avatar sx={{ width: 75, height: 75 }}>
                 <img
                   onError={(e) => {
-                    e.target.onerror = null; // prevent infinite loop
+                    e.target.onerror = null;
                     e.target.src = "";
                     e.target.style.backgroundColor = player.picture_link;
                   }}
@@ -182,7 +185,7 @@ function ScoreCard(props) {
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "row",
+                  flexDirection: "column",
                   alignContent: "center",
                   justifyContent: "center",
                   alignItems: "center",
@@ -198,11 +201,11 @@ function ScoreCard(props) {
                 </h1>
                 <h4
                   style={{
-                    fontSize: "1.1rem",
+                    fontSize: "1.5rem",
                     margin: 0,
                     marginRight: "1rem",
                   }}>
-                  {/* ({getScore(player.lineScore)}) */}
+                  {formattedScore}
                 </h4>
               </div>
               <div
@@ -213,7 +216,18 @@ function ScoreCard(props) {
                   justifyContent: "center",
                   alignItems: "center",
                 }}>
-                <IconButton onClick={() => updatePlayerScore(player, -1)} style={{ color: "white" }} size="large">
+                <IconButton
+                  onClick={() =>
+                    setRoundData((prev) =>
+                      prev.map((p) =>
+                        p.playerKey === player.playerKey
+                          ? { ...p, [`hole${currentHole}`]: Math.max(0, (p[`hole${currentHole}`] || 0) - 1) }
+                          : p
+                      )
+                    )
+                  }
+                  style={{ color: "white" }}
+                  size="large">
                   <RemoveIcon style={{ fontSize: "3rem" }} />
                 </IconButton>
                 <h1
@@ -223,27 +237,46 @@ function ScoreCard(props) {
                     fontFamily: "'scoreboard', cursive",
                     color: "white",
                   }}>
-                  {/* {player.lineScore[currentHole - 1]} */}
+                  {player[`hole${currentHole}`] || 0}
                 </h1>
-                <IconButton onClick={() => updatePlayerScore(player, 1)} style={{ color: "white" }} size="large">
+                <IconButton
+                  onClick={() =>
+                    setRoundData((prev) =>
+                      prev.map((p) =>
+                        p.playerKey === player.playerKey
+                          ? { ...p, [`hole${currentHole}`]: Math.max(0, (p[`hole${currentHole}`] || 0) + 1) }
+                          : p
+                      )
+                    )
+                  }
+                  style={{ color: "white" }}
+                  size="large">
                   <AddIcon style={{ fontSize: "3rem" }} />
                 </IconButton>
               </div>
             </div>
           );
         })}
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "0 20px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "0 20px",
+            bottom: roundData.length > 5 ? 40 : "auto",
+            left: roundData.length > 5 ? 150 : "auto",
+            position: roundData.length > 5 ? "absolute" : "relative",
+          }}>
           <Button
             variant="contained"
             style={{ backgroundColor: "#5bc957ff" }}
-            onClick={() => setCurrentHole((prev) => (prev < 9 ? prev + 1 : 10))}>
+            onClick={() => setCurrentHole((prev) => (prev < 9 ? prev - 1 : 10))}>
             Previous Hole
           </Button>
           <Button
             variant="contained"
-            style={{ backgroundColor: "#5bc957ff" }}
-            onClick={() => setCurrentHole((prev) => (prev < 9 ? prev + 1 : 10))}>
-            Next Hole
+            style={{ backgroundColor: "#5bc957ff", marginLeft: roundData.length > 5 ? 30 : "auto" }}
+            onClick={() => goToNextHole()}>
+            {currentHole < 9 ? `Next Hole` : "Finish Round"}
           </Button>
         </div>
       </div>
