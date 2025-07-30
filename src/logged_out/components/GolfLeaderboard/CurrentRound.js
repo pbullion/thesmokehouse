@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "react-image-gallery/styles/css/image-gallery.css";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { IconButton, Button } from "@mui/material";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableRow, Paper } from "@mui/material";
 import moment from "moment";
 
-function CourseRecordHighest(props) {
-  const { holeData, courseRecordData } = props;
-  const [data, setData] = useState(courseRecordData);
+function CurrentRound(props) {
+  const { holeData, currentRound } = props;
+  const [data, setData] = useState(currentRound);
   const [isDay, setIsDay] = useState(true);
   useEffect(() => {
-    setData(courseRecordData);
-  }, [isDay, holeData, courseRecordData]);
+    const filteredPlayers = Object.fromEntries(
+      Object.entries(currentRound).filter(([key, value]) => key.includes("player") && value !== null)
+    );
+    console.log("🚀 ~ CurrentRound ~ validPlayerKeys:", filteredPlayers);
+    console.log("🚀 ~ CurrentRound ~ validPlayerKeys:", getPlayersSortedByScore(filteredPlayers));
+    setData(filteredPlayers);
+  }, [isDay, holeData, currentRound]);
   const getHoleScore = (hole, score) => {
     if (isDay) {
       const { par } = holeData.day[hole];
@@ -29,6 +31,30 @@ function CourseRecordHighest(props) {
     } else {
       return holeData.night[hole].score;
     }
+  };
+
+  const getPlayersSortedByScore = (data, highest) => {
+    const players = [];
+    data.forEach((round) => {
+      for (let i = 1; i <= 10; i++) {
+        const player = round[`player_${i}`];
+        if (player) {
+          const scores = [];
+          for (let h = 1; h <= 9; h++) {
+            scores.push(player[`hole${h}`] ?? 0);
+          }
+          const total = scores.reduce((sum, val) => sum + val, 0);
+          players.push({
+            round: round.id,
+            date: round.date,
+            playerID: player.playerID,
+            scores,
+            total,
+          });
+        }
+      }
+    });
+    return highest ? players.sort((a, b) => a.total - b.total) : players.sort((a, b) => b.total - a.total);
   };
   return (
     <div
@@ -54,7 +80,7 @@ function CourseRecordHighest(props) {
         src={`${process.env.PUBLIC_URL}/images/smokehouse/logo.png`}
         alt={"smokehouse"}
       />
-      <h1 style={{ margin: 0, fontSize: "8rem", marginBottom: "150px" }}>Highest Scores</h1>
+      <h1 style={{ margin: 0, fontSize: "8rem", marginBottom: "150px" }}>Current Round</h1>
       <TableContainer component={Paper} style={{ width: "90%", backgroundColor: "transparent" }}>
         <Table>
           <TableBody>
@@ -129,4 +155,4 @@ function CourseRecordHighest(props) {
   );
 }
 
-export default CourseRecordHighest;
+export default CurrentRound;

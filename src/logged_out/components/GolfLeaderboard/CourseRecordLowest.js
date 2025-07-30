@@ -8,11 +8,12 @@ import moment from "moment";
 
 function CourseRecordLowest(props) {
   const { holeData, courseRecordData } = props;
+  console.log("🚀 ~ CourseRecordLowest ~ courseRecordData:", courseRecordData);
   const [isDay, setIsDay] = useState(true);
   useEffect(() => {}, [isDay, holeData]);
   const getHoleScore = (hole, score) => {
     if (isDay) {
-      const par = holeData.day[hole].par;
+      const { par } = holeData.day[hole];
       if (score === par) return par;
       if (score === par + 1) return <span className="score-square">{score}</span>;
       if (score === par - 1) return <span className="score-circle">{score}</span>;

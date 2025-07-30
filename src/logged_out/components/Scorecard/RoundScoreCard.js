@@ -39,13 +39,16 @@ function ScoreCard(props) {
   useEffect(() => {}, [roundData]);
   const goToNextHole = async () => {
     try {
-      const response = await fetch(`http://192.168.1.16:3001/the-links-at-the-smokehouse/update-score/${props.roundID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(roundData),
-      });
+      const response = await fetch(
+        `https://sheline-art-website-api.herokuapp.com/the-links-at-the-smokehouse/update-score/${props.roundID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(roundData),
+        }
+      );
       const data = await response.json();
       const { round } = data;
       const parsedRoundData = Object.entries(round[0])

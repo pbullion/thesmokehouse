@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "react-image-gallery/styles/css/image-gallery.css";
 import GolfLeaderboard from "./GolfLeaderboard";
-import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 
 function Home(props) {
   const { selectTheLinksAtTheSmokehouse } = props;
   useEffect(() => {
     selectTheLinksAtTheSmokehouse();
   }, [selectTheLinksAtTheSmokehouse]);
-  const { type, roundID } = useParams();
-  console.log("🚀 ~ Home ~ roundID:", roundID);
-  console.log("🚀 ~ Home ~ type:", type);
-  const [holeData, setHoleData] = useState({
+  const [holeData] = useState({
     day: {
       1: { par: 3 },
       2: { par: 4 },

@@ -13,7 +13,7 @@ function CourseRecord(props) {
   useEffect(() => {}, [isDay, holeData]);
   const getHoleScore = (hole, score) => {
     if (isDay) {
-      const par = holeData.day[hole].par;
+      const { par } = holeData.day[hole];
       if (score === par) return par;
       if (score === par + 1) return <span className="score-square">{score}</span>;
       if (score === par - 1) return <span className="score-circle">{score}</span>;
@@ -62,7 +62,7 @@ function CourseRecord(props) {
           )}.jpg`}
           alt={"profilePic"}
         />
-        <h1 style={{ margin: 0, fontSize: "8rem" }}>{courseRecordData?.playerName}</h1>
+        <h1 style={{ margin: 0, lineHeight: 0.7, fontSize: "8rem" }}>{courseRecordData?.playerName}</h1>
       </div>
       <h1 style={{ margin: 0, fontSize: "5.5rem" }}>{moment(courseRecordData?.date).format("MMMM Do, YYYY")}</h1>
       <TableContainer component={Paper} style={{ width: "80%", backgroundColor: "transparent" }}>
