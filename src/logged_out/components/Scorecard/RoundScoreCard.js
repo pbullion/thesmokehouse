@@ -39,6 +39,9 @@ function ScoreCard(props) {
   useEffect(() => {}, [roundData]);
   const goToNextHole = async () => {
     try {
+      console.log("🚀 ~ goToNextHole ~ roundData:", roundData);
+      const allTheData = { current_hole: currentHole + 1, players: roundData };
+      console.log("🚀 ~ goToNextHole ~ allTheData:", allTheData);
       const response = await fetch(
         `https://sheline-art-website-api.herokuapp.com/the-links-at-the-smokehouse/update-score/${props.roundID}`,
         {
@@ -46,7 +49,7 @@ function ScoreCard(props) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(roundData),
+          body: JSON.stringify(allTheData),
         }
       );
       const data = await response.json();

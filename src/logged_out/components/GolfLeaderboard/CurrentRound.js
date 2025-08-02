@@ -8,53 +8,82 @@ function CurrentRound(props) {
   const [data, setData] = useState(currentRound);
   const [isDay, setIsDay] = useState(true);
   useEffect(() => {
-    const filteredPlayers = Object.fromEntries(
-      Object.entries(currentRound).filter(([key, value]) => key.includes("player") && value !== null)
-    );
-    console.log("🚀 ~ CurrentRound ~ validPlayerKeys:", filteredPlayers);
-    console.log("🚀 ~ CurrentRound ~ validPlayerKeys:", getPlayersSortedByScore(filteredPlayers));
-    setData(filteredPlayers);
+    const filteredPlayers = Object.fromEntries(Object.entries(currentRound).filter(([key, value]) => value !== null));
+    const sortedPlayers = getPlayersSortedByScore(filteredPlayers, false);
+    setData(sortedPlayers);
   }, [isDay, holeData, currentRound]);
   const getHoleScore = (hole, score) => {
     if (isDay) {
       const { par } = holeData.day[hole];
       if (score === par) return par;
-      if (score === par + 1) return <span className="score-square">{score}</span>;
-      if (score === par - 1) return <span className="score-circle">{score}</span>;
-      if (score === par - 2) return <span className="score-circle">{score}</span>;
-      if (score > par + 1)
+      else if (score === par + 1) return <span className="score-square">{score}</span>;
+      else if (score === par - 1) return <span className="score-circle">{score}</span>;
+      else if (score < par - 1)
+        return (
+          <span className="score-circle-outer">
+            <span className="score-circle">{score}</span>
+          </span>
+        );
+      else if (score > par + 1)
         return (
           <span className="outer-square">
             <span className="inner-square">{score}</span>
           </span>
         );
+      else {
+        return "-";
+      }
     } else {
-      return holeData.night[hole].score;
+      return "-";
     }
   };
-
+  const fillRemainingHoles = (scores, currentHole) => {
+    const result = [];
+    for (let i = 1; i <= 9; i++) {
+      if (i <= currentHole) {
+        result.push(scores[i - 1] ?? "-");
+      } else {
+        result.push("-");
+      }
+    }
+    return result;
+  };
+  const getPlayerScoreToPar = (player) => {
+    const day = holeData.day;
+    let totalPar = 0;
+    for (let i = 1; i <= currentRound.current_hole - 1; i++) {
+      const hole = day[i];
+      if (hole && hole.par) {
+        totalPar += hole.par;
+      }
+    }
+    const total = player.scores.reduce((sum, val) => sum + (val === "-" ? 0 : val), 0);
+    const score = total - totalPar;
+    if (score === 0) return "E";
+    if (score > 0) return `+${score}`;
+    if (score < 0) return score.toString();
+  };
   const getPlayersSortedByScore = (data, highest) => {
     const players = [];
-    data.forEach((round) => {
-      for (let i = 1; i <= 10; i++) {
-        const player = round[`player_${i}`];
-        if (player) {
-          const scores = [];
-          for (let h = 1; h <= 9; h++) {
-            scores.push(player[`hole${h}`] ?? 0);
-          }
-          const total = scores.reduce((sum, val) => sum + val, 0);
-          players.push({
-            round: round.id,
-            date: round.date,
-            playerID: player.playerID,
-            scores,
-            total,
-          });
-        }
-      }
-    });
-    return highest ? players.sort((a, b) => a.total - b.total) : players.sort((a, b) => b.total - a.total);
+    const { current_hole, id, date } = data;
+    Object.keys(data)
+      .filter((key) => key.startsWith("player_") && data[key] !== null)
+      .forEach((key) => {
+        const player = data[key];
+        console.log("🚀 ~ getPlayersSortedByScore ~ player:", player);
+        const scores = Array.from({ length: current_hole - 1 }, (_, i) => player[`hole${i + 1}`]);
+        const total = scores.reduce((sum, val) => sum + val, 0);
+        players.push({
+          currentHole: current_hole,
+          round: id,
+          date: date,
+          playerName: player.first_name + " " + player.last_name,
+          playerID: player.playerID,
+          scores: fillRemainingHoles(scores, current_hole),
+          total,
+        });
+      });
+    return players.sort((a, b) => a.total - b.total);
   };
   return (
     <div
@@ -114,40 +143,40 @@ function CurrentRound(props) {
             </TableRow>
             {/* Player Row */}
             {data?.length > 0 &&
-              data.map((player, idx) => (
-                <TableRow key={`player-${idx}`}>
-                  <TableCell style={{ color: "white", fontSize: "3rem" }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <img
-                        onError={(e) => {
-                          e.target.onerror = null; // prevent infinite loop
-                          e.target.src = "";
-                          e.target.style.backgroundColor = player.picture_link;
-                        }}
-                        src={`${process.env.PUBLIC_URL}/images/smokehouse/players/${player?.playerName.replace(
-                          " ",
-                          ""
-                        )}.jpg`}
-                        alt=""
-                        style={{ height: 100, borderRadius: "50%", marginRight: 15 }}
-                      />
-                      <strong>{player?.playerName}</strong>
-                      <p style={{ fontSize: "1.5rem", marginLeft: 15 }}>{moment(player?.date).format("M/DD/YY")}</p>
-                    </div>
-                  </TableCell>
-                  {player?.scores.map((score, idx) => (
-                    <TableCell style={{ color: "white", fontSize: "3rem" }} key={`score-${idx}`} align="center">
-                      {getHoleScore(idx + 1, score)}
+              data.map((player, idx) => {
+                return (
+                  <TableRow key={`player-${idx}`}>
+                    <TableCell style={{ color: "white", fontSize: "3rem" }}>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <img
+                          onError={(e) => {
+                            e.target.onerror = null; // prevent infinite loop
+                            e.target.src = "";
+                            e.target.style.backgroundColor = player.picture_link;
+                          }}
+                          src={`${process.env.PUBLIC_URL}/images/smokehouse/players/${player?.playerName.replace(
+                            " ",
+                            ""
+                          )}.jpg`}
+                          alt=""
+                          style={{ height: 100, borderRadius: "50%", marginRight: 15 }}
+                        />
+                        <strong>{player?.playerName}</strong>
+                      </div>
                     </TableCell>
-                  ))}
-                  <TableCell style={{ color: "white", fontSize: "3rem" }} align="center">
-                    <strong>
-                      {player?.total} ({player?.total - 27 > 0 ? "+" : ""}
-                      {player?.total - 27})
-                    </strong>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    {player?.scores.map((score, idx) => (
+                      <TableCell style={{ color: "white", fontSize: "3rem" }} key={`score-${idx}`} align="center">
+                        {getHoleScore(idx + 1, score)}
+                      </TableCell>
+                    ))}
+                    <TableCell style={{ color: "white", fontSize: "3rem", textAlign: "right" }} align="center">
+                      <strong>
+                        {player?.total} ({getPlayerScoreToPar(player)})
+                      </strong>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
           </TableBody>
         </Table>
       </TableContainer>

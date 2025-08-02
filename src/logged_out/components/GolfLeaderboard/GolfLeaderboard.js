@@ -115,6 +115,7 @@ function Recap(props) {
       const data = await response.json();
       const { scores, players } = data;
       setPlayers(players);
+      let inProgressRound = null;
       const parsedScoreData = scores
         .map((entry) => {
           const newEntry = { ...entry };
@@ -123,11 +124,14 @@ function Recap(props) {
             if (newEntry[key]) {
               try {
                 newEntry[key] = JSON.parse(newEntry[key]);
-              } catch (e) {}
+              } catch (e) {
+                console.error(`Error parsing player data for ${key}:`, e);
+              }
             }
           }
           if (newEntry.in_progress) {
-            setCurrentRound(newEntry);
+            console.log("🚀 ~ fetchData ~ newEntry:", newEntry);
+            inProgressRound = newEntry;
             setRoundInProgress(true);
           }
           return newEntry;
@@ -137,6 +141,8 @@ function Recap(props) {
       const result = getLowestTotalPlayer(parsedScoreData);
       const { first_name, last_name } = players?.find((p) => p.id === result.playerID);
       result.playerName = `${first_name} ${last_name}`;
+
+      setCurrentRound(inProgressRound);
       setCourseRecordData(result);
       const highestResult = getHighestTotalPlayer(parsedScoreData);
       const { first_name: highestFirstName, last_name: highestLastName } = players?.find(

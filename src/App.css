@@ -26,6 +26,17 @@ body {
   font-size: 3rem;
   color: white;
 }
+.score-circle-outer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  border: 2px solid white;
+  font-size: 3rem;
+  color: white;
+}
 .score-square {
   display: inline-flex;
   align-items: center;
