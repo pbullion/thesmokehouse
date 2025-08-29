@@ -92,7 +92,7 @@ function CourseRecordLowest(props) {
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <img
                         style={{ height: 100, borderRadius: "50%", marginRight: 15 }}
-                        src={`https://thelinksatthesmokehouse.s3.us-east-1.amazonaws.com/profile_pics/${player?.playerName.replace(
+                        src={`${process.env.PUBLIC_URL}/images/smokehouse/players/${player?.playerName.replace(
                           " ",
                           ""
                         )}.jpg`}
