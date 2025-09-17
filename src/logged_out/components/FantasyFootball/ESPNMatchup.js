@@ -50,15 +50,23 @@ export default function MatchupView({ url, leagueName }) {
       marginBottom: 12,
     },
     teamLogo: { width: 56, height: 56, borderRadius: 12, objectFit: "cover" },
-    teamName: { fontSize: 25, fontWeight: 700, lineHeight: 1.2, marginBottom: 3 },
-    metaRow: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" },
+    teamName: {
+      fontSize: "1.3rem",
+      fontWeight: 700,
+      lineHeight: 1.2,
+      textAlign: "center",
+      width: "100%",
+      marginBottom: 6,
+    },
+    metaRow: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", flexDirection: "column" },
     pill: {
       display: "inline-flex",
       alignItems: "center",
       gap: 6,
+      width: "90%",
       padding: "6px 10px",
       borderRadius: 999,
-      fontSize: 20,
+      fontSize: 25,
       border: "1px solid #e2e8f0",
       background: "#f8fafc",
     },
@@ -182,17 +190,17 @@ function TeamColumn({ team, otherTeam, side, recordStr, styles }) {
       }}>
       <header style={{ ...styles.teamHeader, width: "100%", display: "flex", gap: 12, alignItems: "center" }}>
         {/* <img src={team.logo} alt={`${team.name} logo`} style={styles.teamLogo} /> */}
-        <div>
+        <div style={{ width: "100%" }}>
           <div style={styles.teamName}>{team.name}</div>
           <div style={styles.metaRow}>
             {/* <span style={styles.pill}>
               <strong>Record:</strong> {recordStr(team)}
             </span> */}
             <span style={{ ...styles.pill }}>
-              <strong>Proj:</strong> {fmt(team.projected)}
+              Proj: <strong>{fmt(team.projected)}</strong>
             </span>
             <span style={{ ...styles.pill, ...styles.pillEmph }}>
-              <strong>Total:</strong> {fmt(team.total)}
+              Total: <strong>{fmt(team.total)}</strong>
             </span>
           </div>
         </div>
