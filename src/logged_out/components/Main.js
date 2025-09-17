@@ -26,6 +26,11 @@ function Main(props) {
     document.title = "Mancave Displays";
     setSelectedTab("Home");
   }, [setSelectedTab]);
+  const selectFF = useCallback(() => {
+    smoothScrollTop();
+    document.title = "Mancave Displays";
+    setSelectedTab("Home");
+  }, [setSelectedTab]);
 
   const selectTheLinksAtTheSmokehouse = useCallback(() => {
     smoothScrollTop();
@@ -59,6 +64,7 @@ function Main(props) {
         selectGifDisplay={selectGifDisplay}
         selectSmokehouseStock={selectSmokehouseStock}
         selectTheLinksAtTheSmokehouse={selectTheLinksAtTheSmokehouse}
+        selectFF={selectFF}
         pushMessageToSnackbar={pushMessageToSnackbar}
       />
     </div>

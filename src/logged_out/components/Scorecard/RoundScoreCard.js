@@ -67,7 +67,7 @@ function ScoreCard(props) {
       setRoundData((prev) => parsedRoundData);
       setCurrentHole((prev) => (prev < 9 ? prev + 1 : 10));
       if (currentHole === 10) {
-        // Do something specific for hole 10
+        // Do something specific for hole 10;
         // go home
       }
     } catch (error) {

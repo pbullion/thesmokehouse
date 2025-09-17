@@ -9,9 +9,10 @@ import NewRound from "./NewRound";
 import GolfLeaderboard from "./GolfLeaderboard";
 import useLocationBlocker from "../../shared/functions/useLocationBlocker";
 import ScoreCard from "./Scorecard";
+import FantasyFootball from "./FantasyFootball";
 
 function Routing(props) {
-  const { selectHome, selectGifDisplay, selectTheLinksAtTheSmokehouse, selectSmokehouseStock } = props;
+  const { selectHome, selectGifDisplay, selectFF, selectTheLinksAtTheSmokehouse, selectSmokehouseStock } = props;
   useLocationBlocker();
   return (
     <Switch>
@@ -22,6 +23,7 @@ function Routing(props) {
         selectGifDisplay={selectGifDisplay}
         vertical={false}
       />
+      <PropsRoute path="/fantasy-football" component={FantasyFootball} selectFF={selectFF} vertical={false} />
       <PropsRoute path="/smokehouseStock" component={SmokehouseStock} selectSmokehouseStock={selectSmokehouseStock} />
       <PropsRoute
         path="/scorecard/:roundID"

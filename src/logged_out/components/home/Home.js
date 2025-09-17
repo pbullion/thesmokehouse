@@ -54,6 +54,16 @@ function Home(props) {
               variant="contained"
               style={{ backgroundColor: "#5bc957ff", color: "white", width: 425, padding: 10, borderRadius: 10 }}
               onClick={() => {
+                history.push(`/fantasy-football`);
+              }}>
+              <p style={{ fontFamily: "'Baloo Bhaijaan', cursive", fontSize: 20 }}>Fantasy Football Scores</p>
+            </Button>
+          </div>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <Button
+              variant="contained"
+              style={{ backgroundColor: "#5bc957ff", color: "white", width: 425, padding: 10, borderRadius: 10 }}
+              onClick={() => {
                 history.push(`/smokehouseStock`);
               }}>
               <p style={{ fontFamily: "'Baloo Bhaijaan', cursive", fontSize: 20 }}>Check / Update the Kitchen Stock</p>
