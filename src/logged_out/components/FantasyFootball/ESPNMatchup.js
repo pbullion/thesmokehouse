@@ -29,7 +29,7 @@ export default function MatchupView({ url, leagueName }) {
       justifyContent: "space-between",
       alignItems: "baseline",
     },
-    headerTitle: { fontSize: 50, fontWeight: 700 },
+    headerTitle: { fontSize: 50, fontWeight: 700, color: "white" },
     headerSub: { fontSize: 14, color: "#64748b" },
     layout: {
       display: "grid",
@@ -155,13 +155,21 @@ function sortByPosition(players) {
 function TeamColumn({ team, otherTeam, side, recordStr, styles }) {
   if (!team) return null;
   const isMyTeamProjectedToWin = (team, otherTeam) => {
+    console.log("🚀 ~ isMyTeamProjectedToWin ~ team, otherTeam:", team, otherTeam);
     if (!team || !otherTeam) return false;
-    const myTeamNames = ["Patrick's Perfect Team", "Touchdown My Pants"];
+    const myTeamNames = ["Patrick's Perfect Team", "Touchdown My Pants", "Urine Trouble", "UrineSumTrouble"];
     const myTeam = myTeamNames.includes(team.name) ? team : myTeamNames.includes(otherTeam.name) ? otherTeam : null;
     const opponent = myTeam === team ? otherTeam : team;
     if (!myTeam || !opponent) return false;
-    if (myTeam.projected > opponent.projected && team.name === myTeam.name) return "#5bd797ff";
-    if (myTeam.projected < opponent.projected && team.name === myTeam.name) return "#f95f5fff";
+    console.log("🚀 ~ isMyTeamProjectedToWin ~ myTeam.projected:", myTeam.projected);
+    console.log("🚀 ~ isMyTeamProjectedToWin ~ opponent.projected:", opponent.projected);
+    if (myTeam.projected > opponent.projected && team.name === myTeam.name) {
+      return "#5bd797ff";
+    } else if (myTeam.projected < opponent.projected && team.name === myTeam.name) {
+      return "#f95f5fff";
+    } else {
+      return "white";
+    }
   };
   const players = Array.isArray(team.starters) ? team.starters : [];
 

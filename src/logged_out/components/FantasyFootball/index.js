@@ -16,6 +16,9 @@ function FantasyFootball({ selectFF }) {
         gridTemplateColumns: "repeat(4, 1fr)",
         gap: "0.5rem", // space between items
         padding: "0.5rem",
+        color: "white",
+        backgroundColor: "#000000",
+        height: "100vh",
       }}>
       <ESPNMatchup
         leagueName="The League"
