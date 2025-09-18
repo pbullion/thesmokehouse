@@ -29,7 +29,14 @@ export default function MatchupView({ url, leagueName }) {
       justifyContent: "space-between",
       alignItems: "baseline",
     },
-    headerTitle: { fontSize: 50, fontWeight: 700, color: "white" },
+    headerTitle: {
+      fontSize: 50,
+      fontWeight: 700,
+      color: "white",
+      fontFamily: "'Baloo Bhaijaan', cursive",
+      textAlign: "center",
+      width: "100%",
+    },
     headerSub: { fontSize: 14, color: "#64748b" },
     layout: {
       display: "grid",
@@ -51,12 +58,12 @@ export default function MatchupView({ url, leagueName }) {
     },
     teamLogo: { width: 56, height: 56, borderRadius: 12, objectFit: "cover" },
     teamName: {
+      fontFamily: "'Baloo Bhaijaan', cursive",
       fontSize: "1.3rem",
       fontWeight: 700,
       lineHeight: 1.2,
       textAlign: "center",
       width: "100%",
-      marginBottom: 6,
     },
     metaRow: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", flexDirection: "column" },
     pill: {
@@ -69,6 +76,14 @@ export default function MatchupView({ url, leagueName }) {
       fontSize: 25,
       border: "1px solid #e2e8f0",
       background: "#f8fafc",
+    },
+    recordPill: {
+      fontSize: "0.8rem",
+      fontWeight: 700,
+      lineHeight: 1.2,
+      textAlign: "center",
+      width: "100%",
+      marginBottom: 6,
     },
     pillEmph: {
       background: "#eff6ff",
@@ -192,10 +207,10 @@ function TeamColumn({ team, otherTeam, side, recordStr, styles }) {
         {/* <img src={team.logo} alt={`${team.name} logo`} style={styles.teamLogo} /> */}
         <div style={{ width: "100%" }}>
           <div style={styles.teamName}>{team.name}</div>
+          <div style={styles.recordPill}>
+            <strong>Record:</strong> {recordStr(team)}
+          </div>
           <div style={styles.metaRow}>
-            {/* <span style={styles.pill}>
-              <strong>Record:</strong> {recordStr(team)}
-            </span> */}
             <span style={{ ...styles.pill }}>
               Proj: <strong>{fmt(team.projected)}</strong>
             </span>

@@ -17,25 +17,33 @@ function FantasyFootball({ selectFF }) {
         gap: "0.5rem", // space between items
         padding: "0.5rem",
         color: "white",
-        backgroundColor: "#000000",
+        backgroundColor: "#391e1eff",
         height: "100vh",
       }}>
-      <ESPNMatchup
-        leagueName="The League"
-        url={`https://sheline-art-website-api.herokuapp.com/espn-fantasy-football/${week}/9/1429051163`}
-      />
-      <ESPNMatchup
-        leagueName="Opportune"
-        url={`https://sheline-art-website-api.herokuapp.com/espn-fantasy-football/${week}/7/204792412`}
-      />
-      <ESPNMatchup
-        leagueName="BIGGER dynasty"
-        url={`https://sheline-art-website-api.herokuapp.com/sleeper-fantasy-football/${week}/UrineSumTrouble/1180568250419814400`}
-      />
-      <ESPNMatchup
-        leagueName="OG Dirtbag Dynasty"
-        url={`https://sheline-art-website-api.herokuapp.com/sleeper-fantasy-football/${week}/UrineSumTrouble/1180567903047315456`}
-      />
+      <div style={{ padding: 5, borderRadius: 10, backgroundColor: "#59005dff" }}>
+        <ESPNMatchup
+          leagueName="The League"
+          url={`https://sheline-art-website-api.herokuapp.com/espn-fantasy-football/${week}/9/1429051163`}
+        />
+      </div>
+      <div style={{ padding: 5, borderRadius: 10, backgroundColor: "#0D47A1" }}>
+        <ESPNMatchup
+          leagueName="Opportune"
+          url={`https://sheline-art-website-api.herokuapp.com/espn-fantasy-football/${week}/7/204792412`}
+        />
+      </div>
+      <div style={{ padding: 5, borderRadius: 10, backgroundColor: "#795548" }}>
+        <ESPNMatchup
+          leagueName="BIGGER dynasty"
+          url={`https://sheline-art-website-api.herokuapp.com/sleeper-fantasy-football/${week}/UrineSumTrouble/1180568250419814400`}
+        />
+      </div>
+      <div style={{ padding: 5, borderRadius: 10, backgroundColor: "#263238" }}>
+        <ESPNMatchup
+          leagueName="OG Dirtbag Dynasty"
+          url={`https://sheline-art-website-api.herokuapp.com/sleeper-fantasy-football/${week}/UrineSumTrouble/1180567903047315456`}
+        />
+      </div>
     </div>
   );
 }
